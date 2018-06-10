@@ -24,6 +24,7 @@ public class SignalRFuture<V> implements Future<V> {
     boolean mIsDone = false;
     private V mResult = null;
     private List<Runnable> mOnCancelled = new ArrayList<Runnable>();
+    private Object mCancelledLock = new Object();
     private List<Action<V>> mOnDone = new ArrayList<Action<V>>();
     private Object mDoneLock = new Object();
     private List<ErrorCallback> mErrorCallback = new ArrayList<ErrorCallback>();
@@ -40,20 +41,32 @@ public class SignalRFuture<V> implements Future<V> {
      *            The handler
      */
     public void onCancelled(Runnable onCancelled) {
-        mOnCancelled.add(onCancelled);
+    	synchronized(mCancelledLock){
+    		mOnCancelled.add(onCancelled);
+    	}
     }
 
     /**
-     * Cancels the operation
+     * Cancels the operation if it wasn't already cancelled.
      */
-    public void cancel() {
-        mIsCancelled = true;
-        if (mOnCancelled != null) {
-            for (Runnable onCancelled : mOnCancelled) {
-                onCancelled.run();
-            }
-        }
+    public boolean cancel() {
+    	boolean wasAlreadyCancelled;
+    	
+    	synchronized(mCancelledLock){
+    		wasAlreadyCancelled = mIsCancelled;
+    		if(!mIsCancelled){
+    			mIsCancelled = true;
+                if (mOnCancelled != null) {
+                    for (Runnable onCancelled : mOnCancelled) {
+                        onCancelled.run();
+                    }
+                }
+    		}
+    	}
+        
         mResultSemaphore.release();
+        
+        return !wasAlreadyCancelled;
     }
 
     /**
@@ -92,8 +105,7 @@ public class SignalRFuture<V> implements Future<V> {
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
-        cancel();
-        return true;
+        return cancel();
     }
 
     @Override
