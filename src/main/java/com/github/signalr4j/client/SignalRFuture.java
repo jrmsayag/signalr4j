@@ -123,7 +123,7 @@ public class SignalRFuture<V> implements Future<V> {
             if (errorWasTriggered()) {
                 throw new ExecutionException(mLastError);
             } else if (isCancelled()) {
-                throw new InterruptedException("Operation was cancelled");
+                throw new ExecutionException(new InterruptedException("Operation was cancelled"));
             } else {
                 return mResult;
             }
