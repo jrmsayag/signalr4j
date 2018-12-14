@@ -9,7 +9,7 @@ targetCompatibility = 1.8
 
 group = 'com.github.jrmsayag'
 archivesBaseName = 'signalr4j'
-version = '3.0.1'
+version = '3.0.2-SNAPSHOT'
 
 repositories {
     mavenCentral()
