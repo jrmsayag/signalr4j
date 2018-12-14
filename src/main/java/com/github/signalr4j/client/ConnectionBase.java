@@ -94,6 +94,15 @@ public interface ConnectionBase {
      * Sets the handler for the "ConnectionSlow" event
      */
     void connectionSlow(Runnable handler);
+    
+    /**
+     * Sets the handler for when the connection times out.
+     * <p>
+     * Closing or reconnecting the connection as a result of the timeout
+     * must be performed by classes implementing this interface, so the
+     * passed handler shouldn't take care of this aspect.
+     */
+    void connectionTimeOut(Runnable handler);
 
     /**
      * Sets the handler for the "Closed" event

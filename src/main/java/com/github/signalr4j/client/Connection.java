@@ -66,6 +66,8 @@ public class Connection implements ConnectionBase {
     private ErrorCallback mOnError;
 
     private Runnable mOnConnectionSlow;
+    
+    private Runnable mOnConnectionTimeOut;
 
     private final ArrayList<Runnable> mOnClosed = new ArrayList<Runnable>();
 
@@ -253,6 +255,11 @@ public class Connection implements ConnectionBase {
     @Override
     public void connectionSlow(Runnable handler) {
         mOnConnectionSlow = handler;
+    }
+    
+    @Override
+    public void connectionTimeOut(Runnable handler) {
+    	mOnConnectionTimeOut = handler;
     }
 
     @Override
@@ -678,6 +685,11 @@ public class Connection implements ConnectionBase {
                 @Override
                 public void run() {
                     log("Timeout", LogLevel.Information);
+                    
+                    if (mOnConnectionTimeOut != null) {
+                    	mOnConnectionTimeOut.run();
+                    }
+                    
                     if(reconnectOnError)
                         reconnect();
                     else

@@ -66,6 +66,10 @@ public class MockConnection implements ConnectionBase {
     @Override
     public void connectionSlow(Runnable handler) {
     }
+    
+    @Override
+    public void connectionTimeOut(Runnable handler) {
+    }
 
     @Override
     public void closed(Runnable handler) {
